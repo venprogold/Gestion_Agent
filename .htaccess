@@ -1,0 +1,18 @@
+# Activation du rewrite engine
+RewriteEngine On
+
+# Sécurité : cacher les fichiers sensibles
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Rediriger l'index vers login
+DirectoryIndex login.php
+
+# Protection des dossiers
+Options -Indexes
+
+# PHP settings
+php_flag session.use_only_cookies on
+php_flag session.use_strict_mode on
