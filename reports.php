@@ -38,4 +38,26 @@ $hoursByMonth = $db->query("SELECT
     WHERE work_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
     GROUP BY DATE_FORMAT(work_date, '%Y-%m')
     ORDER BY month ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+//4. Évaluations moyennes par agent
+    $avgRatings = $db->query("SELECT
+    u.username,
+    ROUND(AVG(r.rating), 1) as avg_rating,
+    COUNT(pr.id) as review_count
+    FROM users u
+    LEFT JOIN performance_reviews pr ON u.id = pr.agent_id
+    WHERE u.role = 'agent'
+    GROUP BY u.id
+    ORDER BY avg_rating DESC")->fetchAll(PDO::FETCH_ASSOC);
+
+//5. Taches complétées par mois (derniers 6 mois)
+$completedByMonth = $db->query("SELECT
+DATE_FORMAT(completed_at, '%Y-%m') as month,
+COUNT (*) as task_count
+FROM tasks
+WHERE status = 'terminee' AND completed_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH) 
+GROUP BY DATE_FORMAT(completed_at, '%Y-%m')
+ORDER BY month ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+//6. Rapport de performance global
 ?>
