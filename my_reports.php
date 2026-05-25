@@ -11,5 +11,11 @@ $reports = $db->prepare("SELECT * FROM work_reports WHERE user_id = ? ORDER BY c
 $reports->execute([$user_id]);
 $reports = $reports->fetchAll();
 
-
+//Récupérer les médias pour chaque rapport
+$media = [];
+foreach ($reports as $r) {
+    $mediaStmt = $db->prepare("SELECT * FROM report_media WHERE report_id = ?");
+    $mediaStmt->execute([$r['id']]);
+    $media[$r['id']] = $mediaStmt->fetchAll();
+}
 ?>
