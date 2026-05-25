@@ -18,4 +18,24 @@ $taskstats = $db->query("SELECT
     FROM tasks")->fetch(PDO::FETCH_ASSOC);
 
 //2. Taches par agent (Top 5)    
+$topAgents = $db->query("SELECT 
+    u.username,
+    COUNT(t.id) as total_tasks,
+    SUM(CASE WHEN t.status = 'terminee' THEN 1 ELSE 0 END) as completed_tasks,
+    ROUND(AVG(CASE WHEN t.status = 'terminee' AND t.actual_hours IS NOT NULL THEN t.actual_hours ELSE NULL END), 1) as avg_hours
+    FROM users u 
+    LEFT JOIN tasks t ON u.id = t.assigned_to
+    WHERE u.role = 'agent'
+    GROUP BY u.id
+    ORDER BY completed_tasks DESC
+    LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+
+//3. Heures travaillées par mois (derniers 6 mois)
+$hoursByMonth = $db->query("SELECT 
+    DATE_FORMAT(work_date, '%Y-%m') as month,
+    SUM(hours_worked) as total_hours
+    FROM work_logs
+    WHERE work_date >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+    GROUP BY DATE_FORMAT(work_date, '%Y-%m')
+    ORDER BY month ASC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
